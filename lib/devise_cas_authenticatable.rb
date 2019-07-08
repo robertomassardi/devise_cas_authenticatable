@@ -81,7 +81,7 @@ module Devise
   # Additional options for CAS client object
   @@cas_client_config_options = {}
 
-  mattr_accessor :cas_base_url, :cas_login_url, :cas_logout_url, :cas_validate_url, :cas_destination_url, :cas_follow_url, :cas_logout_url_param, :cas_create_user, :cas_destination_logout_param_name, :cas_username_column, :cas_enable_single_sign_out, :cas_single_sign_out_mapping_strategy, :cas_user_identifier, :cas_client_config_options
+  mattr_accessor :cas_base_url, :cas_login_url, :cas_logout_url, :cas_validate_url, :cas_destination_url, :cas_follow_url, :cas_logout_url_param, :cas_create_user, :cas_destination_logout_param_name, :cas_username_column, :cas_enable_single_sign_out, :cas_single_sign_out_mapping_strategy, :cas_user_identifier, :cas_client_config_options, :dedagroup_parameter, :cas_client_base_url
 
   def self.cas_create_user?
     cas_create_user
@@ -93,12 +93,12 @@ module Devise
       cas_options = {
         :cas_destination_logout_param_name => @@cas_destination_logout_param_name,
         :cas_base_url => @@cas_base_url,
-        :login_url => @@cas_login_url,
+        :login_url => @@cas_login_url + "?" + @@dedagroup_parameter,
         :logout_url => @@cas_logout_url,
         :validate_url => @@cas_validate_url,
-        :enable_single_sign_out => @@cas_enable_single_sign_out
+        :enable_single_sign_out => @@cas_enable_single_sign_out,
+        :service_url => @@cas_client_base_url
       }
-
       cas_options.merge!(@@cas_client_config_options) if @@cas_client_config_options
 
       CASClient::Client.new(cas_options)
@@ -106,7 +106,8 @@ module Devise
   end
 
   def self.cas_service_url(base_url, mapping)
-    cas_action_url(base_url, mapping, "service")
+    @@cas_client_base_url + "?" + @@dedagroup_parameter
+    #cas_action_url(base_url, mapping, "service")
   end
 
   def self.cas_unregistered_url(base_url, mapping)
